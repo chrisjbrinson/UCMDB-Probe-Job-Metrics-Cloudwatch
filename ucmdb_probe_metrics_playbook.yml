@@ -1,0 +1,48 @@
+---
+- name: Deploy UCMDB Probe CloudWatch Metrics Script
+  hosts: all
+  gather_facts: false
+
+  vars:
+    script_dir: '<Where you want the script to live on the probe>'
+    script_name: ucmdb_probe_metrics.py
+    python_exe: '<Python Directory>'
+
+  tasks:
+
+    - name: Ensure Script directory exists
+      ansible.windows.win_file:
+        path: "{{ script_dir }}"
+        state: directory
+
+    - name: Ensure pip is up to date
+      ansible.windows.win_command:
+        cmd: "{{ python_exe }} -m pip install --upgrade pip"
+
+    - name: Install required Python packages
+      ansible.windows.win_command:
+        cmd: "{{ python_exe }} -m pip install boto3 beautifulsoup4"
+
+    - name: Copy UCMDB metrics script
+      ansible.windows.win_copy:
+        src: "files/{{ script_name }}"
+        dest: "{{ script_dir }}\\{{ script_name }}"
+
+    - name: Create UCMDB CloudWatch Metrics scheduled task
+      community.windows.win_scheduled_task:
+        name: UCMDB CloudWatch Metrics
+        description: Publish UCMDB discovery metrics to AWS CloudWatch
+        username: SYSTEM
+        run_level: highest
+        enabled: true
+        state: present
+
+        actions:
+          - path: "{{ python_exe }}"
+            arguments: '"{{ script_dir }}\\{{ script_name }}"'
+
+        triggers:
+          - type: weekly
+            days_of_week:
+              - friday
+            start_boundary: "2026-01-02T18:00:00"
