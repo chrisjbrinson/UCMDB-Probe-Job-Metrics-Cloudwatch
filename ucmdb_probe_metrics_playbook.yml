@@ -25,7 +25,7 @@
 
     - name: Copy UCMDB metrics script
       ansible.windows.win_copy:
-        src: "files/{{ script_name }}"
+        src: "{{ script_name }}"
         dest: "{{ script_dir }}\\{{ script_name }}"
 
     - name: Create UCMDB CloudWatch Metrics scheduled task
