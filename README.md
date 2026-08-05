@@ -5,4 +5,4 @@ Also included is an ansible playbook to push the script to your probes and creat
 
 # Note
 - This was created around UCMDB version 25.4
-- It is assumed the probe server is assigned an AWS instance role with permissions to access Secrets Manager, and write to Cloudwatch.
+- It is assumed the probe server(s) is assigned an AWS instance role with permissions to access Secrets Manager, and write to Cloudwatch.
